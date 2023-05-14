@@ -3,6 +3,7 @@
 #include <drivers/vga.h>
 #include <memorymanagement.h>
 #include <game/arkanoid.h>
+#include <game/socoban.h>
 
 using namespace myos;
 using namespace myos::common;
@@ -162,8 +163,7 @@ void GamePunkt::Run()
 {
     CompositeWidget* desktop = (CompositeWidget*)this->parent->GetParent();
     
-    ArkanoidGame* game = new ArkanoidGame(desktop, 0, 0, 320, 200, 0x00, 0x00, 0x00);
-    desktop->AddChild((CompositeWidget*)game);
+    SocobanGame* game = new SocobanGame(desktop, 0, 0, 320, 200, 0x00, 0x00, 0x00);
     desktop->GetFocus((CompositeWidget*)game);
 
     // Delete menu from Desktop
