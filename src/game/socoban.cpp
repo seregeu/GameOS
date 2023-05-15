@@ -17,7 +17,7 @@ extern uint64_t tick;
                    int32_t x, int32_t y, int32_t w, int32_t h,
                    uint8_t r, uint8_t g, uint8_t b)
 : CompositeWidget(parent, x, y, w, h, r, g, b){
-	Field field;
+	field = Field(this);
 	field.LoadLevel(0);
 };
 
@@ -34,26 +34,33 @@ extern uint64_t tick;
 
     void SocobanGame::GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b){};
 
+	void SocobanGame::changeMap(char (*myArray)[Field_l]){
+		//this->gc->DrawString("Win!", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+		for (int i = 0; i < Field_h; i++) {
+			for (int j = 0; j < Field_l; j++) {
+				map[i][j] = myArray[i][j];
+			}
+		}
+	}
+
 	void SocobanGame::OnKeyDown(char c)
 	{
-		switch(c)
+		this->field.handleClick(c);
+		/*switch(c)
 		{
 			case 'w':
-				this->gc->DrawString("Wwwwwwwwww", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				this->field.handleClick(c);
 				break;
 			case 'a':
-				this->gc->DrawString("aaaaaaaaaaaaaaaa", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
 				break;
 			case 's':
-				this->gc->DrawString("ssssssssssssssssssss", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
 				break;
 			case 'd':
-				this->gc->DrawString("dddddddddddddddddddd", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
 				break;
 			default:
-				this->gc->DrawString("Win!", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				
 				break;
-		}
+		}*/
 	}
 
     bool SocobanGame::CheckWin(){return false;};
@@ -162,7 +169,10 @@ Finish::Finish(const int x, const int y) {
 
 Finish::~Finish() {}
 
-Field::Field() {
+Field::Field() {}
+
+Field::Field(SocobanGame* game) {
+	curGame = game;
 	box_amount = 0;
 	points = 0;
 	lvl = 0;
@@ -214,11 +224,9 @@ void Field::LoadLevel(const int level) {
 }
 
 void Field::Show() {
-	for (int y = 0; y < Field_h; y++) {
-        
-	}
-
+	curGame->changeMap(map);
 }
+
 unsigned char Field:: WinCheck() {
     	int points=0;
 	for (int i = 0; i < box_amount; i++) {
@@ -236,9 +244,7 @@ unsigned char Field:: WinCheck() {
 	return points;
 }
 void Field::Game() {
-    //tyt nam nado kak-to obrabotat6 nazhatia
 	ShowScreen(0);
-	//тут игра
 	ShowScreen(1);
 	char key=0;
 	while (key != 'x') {
@@ -275,10 +281,117 @@ void Field::Game() {
 	}
 }
 
+void Field::handleClick(char key){
+
+		switch (key) {
+		case 'w':
+			character.Move(UP,this, box_array,box_amount);
+			break;
+		case 's':
+			character.Move(DOWN, this,box_array, box_amount);
+			break;
+		case 'a':
+			character.Move(LEFT, this,box_array, box_amount);
+			break;
+		case 'd':
+			character.Move(RIGHT, this,box_array, box_amount);
+			break;
+		case 'r':
+			LoadLevel(lvl);
+			break;
+		case 'x':
+			key = 'x';
+			break;
+		}
+		/*if (WinCheck() == box_amount) {
+			if (lvl < total_lvl) {
+				lvl++;
+				LoadLevel(lvl);
+				ShowScreen(1);
+			}
+		}*/
+		Show();
+}
+
 void Field::ShowScreen(const unsigned int mode) {
 
 }
 
 bool Field::SetC(const unsigned char dir) {
-    return false;
+	int hy = character.ShowPosY();
+	int hx = character.ShowPosX();
+	switch (dir) {
+	case UP://up
+		switch (map[hy - 1][hx]) {
+		case '#':
+			return false;
+		case 'B':
+			if ((map[hy - 2][hx] == '#') || (map[hy - 2][hx] == 'B')) {
+				return false;
+			}
+			else {
+				character.MoveBox(hy - 1, hx, box_array, box_amount, dir);
+				map[hy - 2][hx] = 'B';
+			}
+
+		default:
+			map[hy - 1][hx] = 'H';
+			map[hy][hx] = ' ';
+			hy = hy - 1;
+		}
+		break;
+	case DOWN://down
+		switch (map[hy + 1][hx]) {
+		case '#':
+			return false;
+		case 'B':
+			if ((map[hy + 2][hx] == '#') || (map[hy + 2][hx] == 'B')) {
+				return false;
+			}
+			else {
+				map[hy + 2][hx] = 'B';
+			}
+
+		default:
+			map[hy + 1][hx] = 'H';
+			map[hy][hx] = ' ';
+			hy = hy + 1;
+		}
+		break;
+	case LEFT://left
+		switch (map[hy][hx - 1]) {
+		case '#':
+			return false;
+		case 'B':
+			if ((map[hy][hx - 2] == '#') || (map[hy][hx - 2] == 'B')) {
+				return false;
+			}
+			else {
+				map[hy][hx - 2] = 'B';
+			}
+		default:
+			map[hy][hx - 1] = 'H';
+			map[hy][hx] = ' ';
+			hx = hx - 1;
+		}
+		break;
+	case RIGHT: //right
+		switch (map[hy][hx + 1]) {
+		case '#':
+			return false;
+		case 'B':
+			if ((map[hy][hx + 2] == '#') || (map[hy][hx + 2] == 'B')) {
+				return false;
+			}
+			else {
+				map[hy][hx + 2] = 'B';
+			}
+		default:
+			map[hy][hx + 1] = 'H';
+			map[hy][hx] = ' ';
+			hx = hx + 1;
+		}
+		break;
+	}
+	return true;
 }

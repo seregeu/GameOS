@@ -26,44 +26,9 @@ namespace myos
         class Box;
         class Finish;
         class Character;
+        class SocobanGame;
 
-        class SocobanGame : public gui::CompositeWidget
-        {
-        public:
-            SocobanGame(gui::Widget* parent,
-                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
-                   common::uint8_t r, common::uint8_t g, common::uint8_t b);
-            ~SocobanGame();
 
-            void Draw(common::GraphicsContext* gc);
-
-            void GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b);
-
-            void OnKeyDown(char c);
-
-            char map [Field_h][Field_l] = {
-            "****************************************",
-            "*                                      *",
-            "*                                      *",
-            "*                 ###                  *",
-            "*                 #o#                  *",
-            "*                 # ####               *",
-            "*               ###B Bo#               *",
-            "*               #o BH###               *",
-            "*               ####B#                 *",
-            "*                  #o#                 *",
-            "*                  ###                 *",
-            "*                                      *",
-            "*                                      *",
-            "*                                      *",
-            "****************************************"
-            };
-
-        private:
-        common::GraphicsContext* gc;
-            bool CheckWin();
-            void ShowWinScreen();
-        };
 
 
         class ObjectOnMap {
@@ -147,6 +112,7 @@ namespace myos
 "*                                      *",
 "****************************************"
 	};
+
             int box_amount;
             unsigned int total_lvl;
             Character character;
@@ -154,14 +120,58 @@ namespace myos
             Finish* finish_array;
             unsigned int lvl;
             void ShowScreen(const unsigned int i);
+            SocobanGame* curGame;
         public:
             Field();
+            Field(SocobanGame* game);
             ~Field();
+            void handleClick(char key);
             void LoadLevel(const int lvl);
             unsigned char WinCheck();
             void Show();
             void Game();
             bool SetC(const unsigned char dir);
+        };
+
+                class SocobanGame : public gui::CompositeWidget
+        {
+        public:
+            SocobanGame(gui::Widget* parent,
+                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
+                   common::uint8_t r, common::uint8_t g, common::uint8_t b);
+            ~SocobanGame();
+
+            void Draw(common::GraphicsContext* gc);
+
+            void GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b);
+
+            void changeMap(char (*myArray)[Field_l]);
+
+            void OnKeyDown(char c);
+
+            char map [Field_h][Field_l] = {
+            "****************************************",
+            "*                                      *",
+            "*                                      *",
+            "*                 ###                  *",
+            "*                 #o#                  *",
+            "*                 # ####               *",
+            "*               ###B Bo#               *",
+            "*               #o BH###               *",
+            "*               ####B#                 *",
+            "*                  #o#                 *",
+            "*                  ###                 *",
+            "*                                      *",
+            "*                                      *",
+            "*                                      *",
+            "****************************************"
+            };
+
+        private:
+        common::GraphicsContext* gc;
+            bool CheckWin();
+            void ShowWinScreen();
+        Field field;
         };
     };
 };
