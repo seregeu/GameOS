@@ -16,13 +16,45 @@ extern uint64_t tick;
     SocobanGame::SocobanGame(Widget* parent,
                    int32_t x, int32_t y, int32_t w, int32_t h,
                    uint8_t r, uint8_t g, uint8_t b)
-: CompositeWidget(parent, x, y, w, h, r, g, b){};
+: CompositeWidget(parent, x, y, w, h, r, g, b){
+	Field field;
+	field.LoadLevel(0);
+};
+
     SocobanGame::~SocobanGame(){};
 
-    void SocobanGame::Draw(common::GraphicsContext* gc){};
+    void SocobanGame::Draw(common::GraphicsContext* gc){
+		CompositeWidget::Draw(gc);
+		this->gc = gc;
+		for (int i = 0; i < Field_h; i++) {
+    		gc->DrawStringSokoban(map[i], 0, i*8, 0xFF, 0xFF, 0xFF);
+		}		
+		//gc->DrawString("Win!", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+	};
 
     void SocobanGame::GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b){};
 
+	void SocobanGame::OnKeyDown(char c)
+	{
+		switch(c)
+		{
+			case 'w':
+				this->gc->DrawString("Wwwwwwwwww", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				break;
+			case 'a':
+				this->gc->DrawString("aaaaaaaaaaaaaaaa", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				break;
+			case 's':
+				this->gc->DrawString("ssssssssssssssssssss", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				break;
+			case 'd':
+				this->gc->DrawString("dddddddddddddddddddd", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				break;
+			default:
+				this->gc->DrawString("Win!", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
+				break;
+		}
+	}
 
     bool SocobanGame::CheckWin(){return false;};
     void SocobanGame::ShowWinScreen(){};
@@ -183,7 +215,7 @@ void Field::LoadLevel(const int level) {
 
 void Field::Show() {
 	for (int y = 0; y < Field_h; y++) {
-        //tyt bydem kak-to ortisovivat6
+        
 	}
 
 }

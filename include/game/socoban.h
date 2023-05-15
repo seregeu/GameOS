@@ -39,7 +39,28 @@ namespace myos
 
             void GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b);
 
+            void OnKeyDown(char c);
+
+            char map [Field_h][Field_l] = {
+            "****************************************",
+            "*                                      *",
+            "*                                      *",
+            "*                 ###                  *",
+            "*                 #o#                  *",
+            "*                 # ####               *",
+            "*               ###B Bo#               *",
+            "*               #o BH###               *",
+            "*               ####B#                 *",
+            "*                  #o#                 *",
+            "*                  ###                 *",
+            "*                                      *",
+            "*                                      *",
+            "*                                      *",
+            "****************************************"
+            };
+
         private:
+        common::GraphicsContext* gc;
             bool CheckWin();
             void ShowWinScreen();
         };
@@ -92,7 +113,7 @@ namespace myos
         private:
             unsigned char points;
             char lvlf [lvlfile_l][lvlfile_h];
-            	char map [Field_h][Field_l] = {
+            char map [Field_h][Field_l] = {
 	"****************************************",
 	"*                                      *",
 	"*                                      *",

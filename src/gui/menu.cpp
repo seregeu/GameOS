@@ -161,9 +161,10 @@ void GamePunkt::Draw(common::GraphicsContext* gc)
 
 void GamePunkt::Run()
 {
-    CompositeWidget* desktop = (CompositeWidget*)this->parent->GetParent();
+ CompositeWidget* desktop = (CompositeWidget*)this->parent->GetParent();
     
     SocobanGame* game = new SocobanGame(desktop, 0, 0, 320, 200, 0x00, 0x00, 0x00);
+    desktop->AddChild((CompositeWidget*)game);
     desktop->GetFocus((CompositeWidget*)game);
 
     // Delete menu from Desktop

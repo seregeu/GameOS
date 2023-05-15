@@ -187,6 +187,37 @@ void VideoGraphicsArray::DrawString(string str, uint32_t x, uint32_t y, uint8_t 
         DrawLetter(str[i], x + 8*i, y, r, g, b);
     }
 }
+
+void VideoGraphicsArray::DrawStringSokoban(string str, uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b)
+{
+    for (int32_t i = 0; str[i] != '\0'; i++) {
+        switch (str[i])
+        {
+         case '*':
+                FillRectangle(x + 8*i, y,7,7, 0x00, 0xA8, 0x00);
+                break;
+            case '#':
+                FillRectangle(x + 8*i, y,7,7, 0xA8, 0x00, 0x00);
+                break;
+            case 'o':
+                DrawCircle(x + 8*i+3, y+3,3, 0x00, 0xA8, 0x00);
+                break;
+            case 'B':
+                DrawRectangle(x + 8*i, y,7,7, 0xFF,0xFF,0xFF);
+                break;
+            case 'H':
+                DrawLetter(str[i], x + 8*i, y, r, g, b);
+                break;
+            case ' ':
+                DrawLetter(str[i], x + 8*i, y, r, g, b);
+                break;
+            default:
+                DrawLetter(str[i], x + 8*i, y, r, g, b);
+                break;
+        }
+    }
+}
+
 void VideoGraphicsArray::DrawLetter(char c, uint32_t x, uint32_t y, uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t* bitmap = vincent_data[c];
