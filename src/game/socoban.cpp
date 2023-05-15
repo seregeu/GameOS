@@ -190,6 +190,12 @@ Field::~Field() {
 }
 
 void Field::LoadLevel(const int level) {
+	int result = 0;
+	if(box_amount!=0){
+		delete (void*) box_array;
+		delete (void*) finish_array;
+		box_amount = 0;
+	}
     for (int i = 0; i < Field_h; i++) {
 		for (int j = 0; j < Field_l; j++) {
 			map[i][j] = savMap[i][j];
@@ -273,8 +279,7 @@ void Field::Game() {
 			if (lvl < total_lvl) {
 				lvl++;
 				LoadLevel(lvl);
-				ShowScreen(1);
-				continue;
+				Show();
 			}
 		}
 		Show();
@@ -303,13 +308,13 @@ void Field::handleClick(char key){
 			key = 'x';
 			break;
 		}
-		/*if (WinCheck() == box_amount) {
+		if (WinCheck() == box_amount) {
 			if (lvl < total_lvl) {
 				lvl++;
 				LoadLevel(lvl);
 				ShowScreen(1);
 			}
-		}*/
+		}
 		Show();
 }
 
