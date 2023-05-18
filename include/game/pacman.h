@@ -1,17 +1,18 @@
 #ifndef __MYOS__GAME__PACMAN_H
 #define __MYOS__GAME__PACMAN_H
 
-#define Field_h 15
-#define Field_l 41
-#define scrLink_am 3
-#define scrLink_len 30
-#define lvlfile_h 99
-#define lvlfile_l 12
-
-#define UP 1
-#define DOWN 2
-#define LEFT 3
-#define RIGHT 4
+#define COUNT_GHOST 4
+#define HEIGH 22
+#define WIDTH 35
+#define GHOST 234 
+#define PACMAN 233 
+#define COIN 157
+#define TIME_SLEEP 30
+#define TIME_WITHOUT_DEATH 20
+#define MAX_COUNT_COIN 4
+#define MAX_TIMELIFE_COIN 60
+#define MIN_TIMELIFE_COIN 20
+#define TIME_CHASE 60
 
 #include <gui/widget.h>
 #include <common/graphicscontext.h>
@@ -23,7 +24,6 @@ namespace myos
     namespace game
     {
 
-        
         class PacmanGame : public gui::CompositeWidget
         {
         public:
@@ -40,6 +40,20 @@ namespace myos
         private:
             common::GraphicsContext* gc;
         };
+
+        class Position
+        {
+        public:
+            Position(){};
+            void SetPosition(common::uint32_t x, common::uint32_t y);
+            common::uint32_t GetPosX() ;
+            common::uint32_t GetPosY() ;
+            ~Position(){};
+        private:
+            common::uint32_t a_pos_x_, a_pos_y_;
+        };
+
+        
 
     }
 }

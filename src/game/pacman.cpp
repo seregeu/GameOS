@@ -30,4 +30,20 @@ extern uint64_t tick;
 
     void PacmanGame::GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b){};
 
+    void Position::SetPosition(common::uint32_t x, common::uint32_t y)
+    {
+        a_pos_x_ = x;
+        a_pos_y_ = y;
+    }
+
+    common::uint32_t Position::GetPosX()
+    {
+        return a_pos_x_;
+    }
+
+    common::uint32_t Position::GetPosY()
+    {
+        return a_pos_y_;
+    }
+
     
