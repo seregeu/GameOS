@@ -2,7 +2,6 @@
 #include <gui/menu.h>
 #include <drivers/vga.h>
 #include <memorymanagement.h>
-#include <game/arkanoid.h>
 #include <game/pacman.h>
 
 using namespace myos;

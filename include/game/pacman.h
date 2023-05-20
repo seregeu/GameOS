@@ -1,21 +1,14 @@
 #ifndef __MYOS__GAME__PACMAN_H
 #define __MYOS__GAME__PACMAN_H
 
-#define COUNT_GHOST 4
-#define HEIGH 22
-#define WIDTH 35
-#define GHOST 234 
-#define PACMAN 233 
-#define COIN 157
-#define TIME_SLEEP 30
-#define TIME_WITHOUT_DEATH 20
-#define MAX_COUNT_COIN 4
-#define MAX_TIMELIFE_COIN 60
-#define MIN_TIMELIFE_COIN 20
-#define TIME_CHASE 60
-
 #include <gui/widget.h>
 #include <common/graphicscontext.h>
+
+#define COIN '.'
+#define PACMAN 'P'
+#define WALL '#'
+#define MONSTER 'M'
+
 
 
 
@@ -37,24 +30,58 @@ namespace myos
             void GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b);
 
             void OnKeyDown(char c);
+
+            PacmanGame();  // Конструктор класса
+
+            void run();  // Метод для запуска игры
         private:
             common::GraphicsContext* gc;
+            static const int MAP_WIDTH = 19;
+            static const int MAP_HEIGHT = 15;
+            char prevMonsterItem = '.';
+
+            char map[MAP_HEIGHT][MAP_WIDTH+1];
+            int pacmanX, pacmanY;
+            int monsterX, monsterY;
+            int coinCount;
+            int dx, dy;  // Направление движения Пакмана
+
+            void drawMap();
+            void movePacman();
+            void moveMonster();
+            void checkCollision();
+            void checkWin();
+            void ShowWinScreen();
+            void ShowLooseScreen();
         };
 
-        class Position
+        class WinScreen : public gui::Widget
         {
         public:
-            Position(){};
-            void SetPosition(common::uint32_t x, common::uint32_t y);
-            common::uint32_t GetPosX() ;
-            common::uint32_t GetPosY() ;
-            ~Position(){};
-        private:
-            common::uint32_t a_pos_x_, a_pos_y_;
+            WinScreen(gui::Widget* parent,
+                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
+                   common::uint8_t r, common::uint8_t g, common::uint8_t b);
+
+            ~WinScreen();
+
+            void Draw(common::GraphicsContext* gc);
+
+            void OnKeyDown(char c);
         };
 
-        
+        class LooseScreen : public gui::Widget
+        {
+        public:
+            LooseScreen(gui::Widget* parent,
+                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
+                   common::uint8_t r, common::uint8_t g, common::uint8_t b);
 
+            ~LooseScreen();
+
+            void Draw(common::GraphicsContext* gc);
+
+            void OnKeyDown(char c);
+        };
     }
 }
 #endif

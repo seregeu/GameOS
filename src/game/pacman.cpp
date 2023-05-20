@@ -12,38 +12,227 @@ using namespace myos::drivers;
 
 extern uint64_t tick;
 
-    PacmanGame::PacmanGame(Widget* parent,
-                   int32_t x, int32_t y, int32_t w, int32_t h,
-                   uint8_t r, uint8_t g, uint8_t b)
-    :  CompositeWidget(parent, x, y, w, h, r, g, b){};
+PacmanGame::PacmanGame(Widget* parent,
+                int32_t x, int32_t y, int32_t w, int32_t h,
+                uint8_t r, uint8_t g, uint8_t b)
+:  CompositeWidget(parent, x, y, w, h, r, g, b){
 
-    PacmanGame::~PacmanGame(){};
+    // Инициализация генератора случайных чисел
+    //srand(time(0));
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+    for (int j = 0; j < MAP_WIDTH; j++) {
+        map[i][j] = ' ';
+    }
+}
 
-    void PacmanGame::Draw(common::GraphicsContext* gc){
-		CompositeWidget::Draw(gc);
-		this->gc = gc;
-		//gc->DrawString("Win!", w/2 - 16, h/2, 0xFF, 0xFF, 0xFF);
-	};
-
-    void PacmanGame::OnKeyDown(char c)
-	{	}
-
-    void PacmanGame::GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b){};
-
-    void Position::SetPosition(common::uint32_t x, common::uint32_t y)
-    {
-        a_pos_x_ = x;
-        a_pos_y_ = y;
+// Инициализация карты
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            if (i == 0 || i == MAP_HEIGHT - 1 || j == 0 || j == MAP_WIDTH -1 || (i % 2 == 0 && j % 2 == 0)) {
+                map[i][j] = WALL;
+            }
+            else {
+                map[i][j] = COIN;
+                coinCount++;
+            }
+        }
+        map[i][MAP_WIDTH] = '\0';  // Добавляем нуль в конец строки
     }
 
-    common::uint32_t Position::GetPosX()
-    {
-        return a_pos_x_;
+
+    // Инициализация координат Пакмана
+    pacmanX = 1;
+    pacmanY = 1;
+    map[pacmanY][pacmanX] = PACMAN;
+
+    // Инициализация координат монстра
+    monsterX = MAP_WIDTH - 2;
+    monsterY = MAP_HEIGHT - 2;
+    map[monsterY][monsterX] = MONSTER;
+
+    // Начальное направление движения Пакмана
+    dx = 1;
+    dy = 0;
+
+    prevMonsterItem = '.';
+};
+
+void PacmanGame::drawMap(){
+    for (int i = 0; i < MAP_HEIGHT; i++) {
+    		gc->DrawString(map[i], 0, i*8, 0xFF, 0xFF, 0xFF);
+	}	
+}
+
+PacmanGame::~PacmanGame(){};
+
+void PacmanGame::Draw(common::GraphicsContext* gc){
+    CompositeWidget::Draw(gc);
+    this->gc = gc;
+    drawMap();
+    movePacman();
+    moveMonster();
+    checkCollision();
+};
+
+void PacmanGame::OnKeyDown(char c) {	
+    switch (c) {
+            case 'w':
+                dx = 0;
+                dy = -1;  // Вверх
+                break;
+            case 's':
+                dx = 0;
+                dy = 1;  // Вниз
+                break;
+            case 'a':
+                dx = -1;
+                dy = 0;  // Влево
+                break;
+            case 'd':
+                dx = 1;
+                dy = 0;  // Вправо
+                break;
+            }
+};
+
+void PacmanGame::GetBackgroudColor(common::uint8_t& r, common::uint8_t& g, common::uint8_t& b){};
+
+void PacmanGame::movePacman() {
+    // Проверяем, можно ли переместить Пакмана в новое положение
+    int newPacmanX = pacmanX + dx;
+    int newPacmanY = pacmanY + dy;
+    if (newPacmanX >= 0 && newPacmanX < MAP_WIDTH && newPacmanY >= 0 && newPacmanY < MAP_HEIGHT &&
+        map[newPacmanY][newPacmanX] != WALL) {
+        // Обновляем координаты Пакмана
+        map[pacmanY][pacmanX] = ' ';
+        pacmanX = newPacmanX;
+        pacmanY = newPacmanY;
+        if (map[pacmanY][pacmanX] == COIN) {
+            coinCount--;
+        }
+        map[pacmanY][pacmanX] = PACMAN;
+    }
+}
+
+void PacmanGame::moveMonster() {
+    // Генерируем случайное направление для монстра
+    RandomGenerator rand = RandomGenerator(coinCount);
+    int direction = rand.Generate() % 4;//rand() % 4;
+    gc->DrawLetter('0'+direction, 150, 150, 0xff,0xff,0xff);
+    // Обновляем координаты монстра в соответствии с направлением
+    switch (direction) {
+    case 0:  // Вверх
+        if (monsterY > 0 && map[monsterY - 1][monsterX] != WALL) {
+            map[monsterY][monsterX] = prevMonsterItem;
+            monsterY--;
+        }
+        break;
+    case 1:  // Вниз
+        if (monsterY < MAP_HEIGHT - 1 && map[monsterY + 1][monsterX] != WALL) {
+            map[monsterY][monsterX] = prevMonsterItem;
+            monsterY++;
+        }
+        break;
+    case 2:  // Влево
+        if (monsterX > 0 && map[monsterY][monsterX - 1] != WALL) {
+            map[monsterY][monsterX] = prevMonsterItem;
+            monsterX--;
+        }
+        break;
+    case 3:  // Вправо
+        if (monsterX < MAP_WIDTH - 1 && map[monsterY][monsterX + 1] != WALL) {
+            map[monsterY][monsterX] = prevMonsterItem;
+            monsterX++;
+        }
+        break;
     }
 
-    common::uint32_t Position::GetPosY()
-    {
-        return a_pos_y_;
+    // Обновляем координаты монстра на карте
+    if (map[monsterY][monsterX] != MONSTER) {
+        prevMonsterItem = map[monsterY][monsterX];
     }
+    map[monsterY][monsterX] = MONSTER;
+}
 
-    
+void PacmanGame::checkCollision() {
+    // Проверяем столкновение с монстром
+    if (pacmanX == monsterX && pacmanY == monsterY) {
+            ShowLooseScreen();
+    }
+}
+
+void PacmanGame::checkWin() {
+    // Проверяем, остались ли еще монеты на карте
+    if (coinCount == 0) {
+        ShowWinScreen();
+    }
+}
+
+void PacmanGame::run() {
+}
+
+void PacmanGame::ShowWinScreen()
+{
+    ((CompositeWidget*)this->parent)->DeleteChild(this);
+
+    Widget* win = new WinScreen(this->parent, 0, 0, w, h, 0x00, 0xA8, 0x00);
+    ((CompositeWidget*)this->parent)->AddChild(win);
+    ((CompositeWidget*)this->parent)->GetFocus(win);
+}
+
+WinScreen::WinScreen(gui::Widget* parent,
+                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
+                   common::uint8_t r, common::uint8_t g, common::uint8_t b)
+: Widget(parent, x, y, w, h, r, g, b)
+{
+
+}
+
+WinScreen::~WinScreen()
+{
+}
+
+void WinScreen::Draw(common::GraphicsContext* gc)
+{
+    Widget::Draw(gc);
+
+    gc->DrawString("You win!", w/2 - 30, h/2, 0xFF, 0xFF, 0xFF);
+}
+
+void WinScreen::OnKeyDown(char c)
+{
+}
+
+
+
+void PacmanGame::ShowLooseScreen()
+{
+    ((CompositeWidget*)this->parent)->DeleteChild(this);
+
+    Widget* Loose = new LooseScreen(this->parent, 0, 0, w, h, 0xA8, 0x00, 0x00);
+    ((CompositeWidget*)this->parent)->AddChild(Loose);
+    ((CompositeWidget*)this->parent)->GetFocus(Loose);
+}
+
+LooseScreen::LooseScreen(gui::Widget* parent,
+                   common::int32_t x, common::int32_t y, common::int32_t w, common::int32_t h,
+                   common::uint8_t r, common::uint8_t g, common::uint8_t b)
+: Widget(parent, x, y, w, h, r, g, b)
+{
+
+}
+
+LooseScreen::~LooseScreen()
+{
+}
+
+void LooseScreen::Draw(common::GraphicsContext* gc)
+{
+    Widget::Draw(gc);
+
+    gc->DrawString("You Loose!", w/2 - 30, h/2, 0xFF, 0xFF, 0xFF);
+}
+
+void LooseScreen::OnKeyDown(char c)
+{
+}

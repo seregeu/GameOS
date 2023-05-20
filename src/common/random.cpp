@@ -23,4 +23,5 @@ RandomGenerator::~RandomGenerator()
 int64_t RandomGenerator::Generate()
 {
     last_value = a + last_value + c;
+    return last_value;
 }
