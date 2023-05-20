@@ -59,7 +59,7 @@ PacmanGame::PacmanGame(Widget* parent,
 
 void PacmanGame::drawMap(){
     for (int i = 0; i < MAP_HEIGHT; i++) {
-    		gc->DrawString(map[i], 0, i*8, 0xFF, 0xFF, 0xFF);
+    		gc->DrawStringPacman(map[i], 0, i*8, 0xFF, 0xFF, 0xFF);
 	}	
 }
 
