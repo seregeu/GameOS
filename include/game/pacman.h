@@ -45,6 +45,7 @@ namespace myos
             int monsterX, monsterY;
             int coinCount;
             int dx, dy;  // Направление движения Пакмана
+            int abs(int num);
 
             void drawMap();
             void movePacman();

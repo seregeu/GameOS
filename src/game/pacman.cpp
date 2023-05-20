@@ -114,37 +114,39 @@ void PacmanGame::movePacman() {
     }
 }
 
+int PacmanGame::abs(int num) {
+    return (num >= 0) ? num : -num;
+}
+
 void PacmanGame::moveMonster() {
-    // Генерируем случайное направление для монстра
-    RandomGenerator rand = RandomGenerator(coinCount);
-    int direction = rand.Generate() % 4;//rand() % 4;
-    gc->DrawLetter('0'+direction, 150, 150, 0xff,0xff,0xff);
-    // Обновляем координаты монстра в соответствии с направлением
-    switch (direction) {
-    case 0:  // Вверх
-        if (monsterY > 0 && map[monsterY - 1][monsterX] != WALL) {
-            map[monsterY][monsterX] = prevMonsterItem;
-            monsterY--;
-        }
-        break;
-    case 1:  // Вниз
-        if (monsterY < MAP_HEIGHT - 1 && map[monsterY + 1][monsterX] != WALL) {
-            map[monsterY][monsterX] = prevMonsterItem;
-            monsterY++;
-        }
-        break;
-    case 2:  // Влево
-        if (monsterX > 0 && map[monsterY][monsterX - 1] != WALL) {
-            map[monsterY][monsterX] = prevMonsterItem;
-            monsterX--;
-        }
-        break;
-    case 3:  // Вправо
-        if (monsterX < MAP_WIDTH - 1 && map[monsterY][monsterX + 1] != WALL) {
-            map[monsterY][monsterX] = prevMonsterItem;
-            monsterX++;
-        }
-        break;
+    RandomGenerator rand(abs(pacmanX - monsterX));
+    // Вычисляем разницу между координатами монстра и Пакмана по каждой оси
+    int randomFactor = rand.Generate();
+    int randomOffset = (randomFactor % 4 == 2) ? rand.Generate() : 0;
+
+    int dx = pacmanX - monsterX + randomOffset;
+    int dy = pacmanY - monsterY;
+
+    // Выбираем направление, куда нужно двигаться монстру
+    int newMonsterX = monsterX;
+    int newMonsterY = monsterY;
+
+    // Проверяем разницу по горизонтали и вертикали
+    if (abs(dx) > abs(dy) && map[newMonsterY][monsterX + (dx > 0 ? 1 : -1)] != WALL) {
+        // Движение по горизонтали
+        newMonsterX = monsterX + (dx > 0 ? 1 : -1);
+    } else {
+        // Движение по вертикали
+        newMonsterY = monsterY + (dy > 0 ? 1 : -1);
+    }
+
+    // Проверяем, можно ли переместить монстра в новое положение
+    if (newMonsterX >= 0 && newMonsterX < MAP_WIDTH && newMonsterY >= 0 && newMonsterY < MAP_HEIGHT &&
+        map[newMonsterY][newMonsterX] != WALL) {
+        // Обновляем координаты монстра
+        map[monsterY][monsterX] = prevMonsterItem;
+        monsterX = newMonsterX;
+        monsterY = newMonsterY;
     }
 
     // Обновляем координаты монстра на карте
